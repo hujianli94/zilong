@@ -15,8 +15,7 @@
 
 from oslo_config import cfg
 
-from kongming.common.i18n import _
-
+from zilong.common.i18n import _
 
 opts = [
     cfg.StrOpt('mysql_engine',

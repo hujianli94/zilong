@@ -11,16 +11,14 @@
 #    under the License.
 
 from oslo_config import cfg
+from zilong.conf import default
+from zilong.conf import api
+from zilong.conf import worker
+from zilong.conf import database
 
-from kongming.conf import agent
-from kongming.conf import api
-from kongming.conf import database
-from kongming.conf import default
-from kongming.conf import nova
-
+# Register the options
 CONF = cfg.CONF
-api.register_opts(CONF)
-database.register_opts(CONF)
 default.register_opts(CONF)
-agent.register_opts(CONF)
-nova.register_opts(CONF)
+api.register_opts(CONF)
+worker.register_opts(CONF)
+database.register_opts(CONF)

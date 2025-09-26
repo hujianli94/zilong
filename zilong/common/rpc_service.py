@@ -13,24 +13,13 @@
 """Common RPC service and API tools for Zilong."""
 
 import eventlet
-from oslo_config import cfg
 import oslo_messaging as messaging
 from oslo_service import service
-
+from zilong.conf import CONF
 from zilong.common import rpc
 from zilong.objects import base as objects_base
 
 eventlet.monkey_patch()
-
-periodic_opts = [
-    cfg.IntOpt('periodic_interval_max',
-               default=60,
-               help='Max interval size between periodic tasks execution in '
-                    'seconds.'),
-]
-
-CONF = cfg.CONF
-CONF.register_opts(periodic_opts)
 
 
 class Service(service.Service):
@@ -39,7 +28,7 @@ class Service(service.Service):
         super(Service, self).__init__()
         serializer = rpc.RequestContextSerializer(
             objects_base.ZilongObjectSerializer())
-        transport = messaging.get_transport(cfg.CONF)
+        transport = messaging.get_transport(CONF)
         # TODO(asalkeld) add support for version='x.y'
         target = messaging.Target(topic=topic, server=server)
         self._server = messaging.get_rpc_server(transport, target, handlers,
@@ -69,7 +58,7 @@ class API(object):
             objects_base.ZilongObjectSerializer())
         if transport is None:
             exmods = rpc.get_allowed_exmods()
-            transport = messaging.get_transport(cfg.CONF,
+            transport = messaging.get_transport(CONF,
                                                 allowed_remote_exmods=exmods)
         self._context = context
         if topic is None:

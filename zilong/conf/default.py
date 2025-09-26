@@ -12,22 +12,23 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
 import os
 import socket
-
 from oslo_config import cfg
+from oslo_log import log as logging
+from zilong.common.i18n import _
 
-from kongming.common.i18n import _
-
-
-exc_log_opts = [
-    cfg.BoolOpt('fatal_exception_format_errors',
-                default=False,
-                help=_('Used if there is a formatting error when generating '
-                       'an exception message (a programming error). If True, '
-                       'raise an exception; if False, use the unformatted '
-                       'message.')),
+opts = [
+    cfg.StrOpt('auth_strategy', default='noauth',
+               help=(_("The type of authentication to use"))),
+    cfg.BoolOpt('allow_pagination', default=False,
+                help=(_("Allow the usage of the pagination"))),
+    cfg.BoolOpt('allow_sorting', default=False,
+                help=(_("Allow the usage of the sorting"))),
+    cfg.StrOpt('pagination_max_limit', default="-1",
+               help=(_("The maximum number of items returned in a single "
+                       "response, value was 'infinite' or negative integer "
+                       "means no limit")))
 ]
 
 service_opts = [
@@ -44,72 +45,30 @@ service_opts = [
                default=60,
                help=_('Default interval (in seconds) for running periodic '
                       'tasks.')),
+    cfg.IntOpt('periodic_interval_max',
+               default=60,
+               help='Max interval size between periodic tasks execution in '
+                    'seconds.'),
 ]
 
 path_opts = [
     cfg.StrOpt('pybasedir',
                default=os.path.abspath(
                    os.path.join(os.path.dirname(__file__), '../')),
-               sample_default='/usr/lib/python/site-packages/kongming/kongming',
+               sample_default='/usr/lib/python/site-packages/zilong/zilong',
                help=_('Directory where the kongming python module is '
                       'installed.')),
     cfg.StrOpt('bindir',
                default='$pybasedir/bin',
-               help=_('Directory where kongming binaries are installed.')),
+               help=_('Directory where zilong binaries are installed.')),
     cfg.StrOpt('state_path',
                default='$pybasedir',
-               help=_("Top-level directory for maintaining kongming's state.")),
-]
-
-PLACEMENT_CONF_SECTION = 'placement'
-
-placement_opts = [
-    cfg.StrOpt('region_name',
-               help=_('Name of placement region to use. Useful if keystone '
-                      'manages more than one region.')),
-    cfg.StrOpt('endpoint_type',
-               default='public',
-               choices=['public', 'admin', 'internal'],
-               help=_('Type of the placement endpoint to use.  This endpoint '
-                      'will be looked up in the keystone catalog and should '
-                      'be one of public, internal or admin.')),
-    cfg.BoolOpt('insecure',
-                default=False,
-                help="""
-                    If true, the vCenter server certificate is not verified.
-                    If false, then the default CA truststore is used for
-                    verification. Related options:
-                    * ca_file: This option is ignored if "ca_file" is set.
-                    """),
-    cfg.StrOpt('cafile',
-               default=None,
-               help="""
-                   Specifies the CA bundle file to be used in verifying the
-                   vCenter server certificate.
-                   """),
-    cfg.StrOpt('certfile',
-               default=None,
-               help="""
-                   Specifies the certificate file to be used in verifying
-                   the vCenter server certificate.
-                   """),
-    cfg.StrOpt('keyfile',
-               default=None,
-               help="""
-                   Specifies the key file to be used in verifying the vCenter
-                   server certificate.
-                   """),
-    cfg.IntOpt('timeout',
-               default=None,
-               help=_('Timeout for inactive connections (in seconds)')),
+               help=_("Top-level directory for maintaining zilong's state.")),
 ]
 
 
 def register_opts(conf):
-    conf.register_opts(exc_log_opts)
+    logging.register_options(conf)
+    conf.register_opts(opts)
     conf.register_opts(service_opts)
     conf.register_opts(path_opts)
-
-
-def register_placement_opts(cfg=cfg.CONF):
-    cfg.register_opts(placement_opts, group=PLACEMENT_CONF_SECTION)

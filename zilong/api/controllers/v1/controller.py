@@ -18,7 +18,7 @@ from pecan import route
 from zilong.api.controllers import base
 from zilong.api.controllers import link
 from zilong.api.controllers import types
-from zilong.api.controllers.v1 import users as v1users
+from zilong.api.controllers.v1 import docker as v1docker
 
 
 class MediaType(base.APIBase):
@@ -65,12 +65,12 @@ class V1(base.APIBase):
                                         bookmark=True, type='text/html')]
         v1.media_types = [MediaType(base='application/json',
                                     type='application/vnd.openstack.zilong.v1+json')]
-        v1.services = [link.Link.make_link('self', request.host_url,
-                                           'services', ''),
-                       link.Link.make_link('bookmark',
-                                           request.host_url,
-                                           'services', '',
-                                           bookmark=True)]
+        # v1.services = [link.Link.make_link('self', request.host_url,
+        #                                    'services', ''),
+        #                link.Link.make_link('bookmark',
+        #                                    request.host_url,
+        #                                    'services', '',
+        #                                    bookmark=True)]
         return v1
 
 
@@ -80,4 +80,4 @@ class V1Controller(object):
         return V1.convert()
 
 
-route(V1Controller, 'users', v1users.UsersController())
+route(V1Controller, 'docker', v1docker.DockerController())

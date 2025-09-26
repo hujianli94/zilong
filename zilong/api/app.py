@@ -10,25 +10,24 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from oslo_config import cfg
 from oslo_middleware import request_id
 from oslo_service import service
 from pecan import configuration
 from pecan import make_app
 from zilong.api import hooks
-from zilong.common import exceptions as p_excp
+from zilong.conf import CONF
 
 
 def setup_app(*args, **kwargs):
     config = {
         'server': {
-            'host': cfg.CONF.api.bind_port,
-            'port': cfg.CONF.api.bind_host
+            'host': CONF.api.bind_port,
+            'port': CONF.api.bind_host
         },
         'app': {
             'root': 'zilong.api.controllers.root.RootController',
             'modules': ['zilong.api'],
-            'debug': cfg.CONF.api.debug,
+            'debug': CONF.debug or CONF.api.debug,
             'acl_public_routes': [
                 '/',
                 '/v1'
@@ -49,6 +48,8 @@ def setup_app(*args, **kwargs):
         force_canonical=False,
         logging=getattr(config, 'logging', {})
     )
+    # 添加请求ID中间件，用于为每个请求生成唯一ID，便于日志追踪
+    app = request_id.RequestId(app)
     return app
 
 

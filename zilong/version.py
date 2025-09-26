@@ -1,3 +1,6 @@
+# Copyright 2018 Huawei Technologies Co.,LTD.
+# All Rights Reserved.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -10,10 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import oslo_i18n as i18n
+import pbr.version
 
-
-_translators = i18n.TranslatorFactory(domain='zilong')
-
-# The primary translation function using the well-known name "_"
-_ = _translators.primary
+version_info = pbr.version.VersionInfo('zilong')
+version_string = version_info.version_string

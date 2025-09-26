@@ -10,10 +10,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from oslo_config import cfg
 import oslo_messaging as messaging
 from oslo_serialization import jsonutils
-from zilong.common import context as zilong_ctx
+from oslo_context import context as oslo_ctx
+from zilong.conf import CONF
 import zilong.common.exceptions
 
 __all__ = [
@@ -29,7 +29,6 @@ __all__ = [
     'get_notifier',
 ]
 
-CONF = cfg.CONF
 TRANSPORT = None
 NOTIFIER = None
 
@@ -45,7 +44,10 @@ def init(conf):
     TRANSPORT = messaging.get_transport(conf,
                                         allowed_remote_exmods=exmods)
     serializer = RequestContextSerializer(JsonPayloadSerializer())
-    NOTIFIER = messaging.Notifier(TRANSPORT, serializer=serializer)
+    # 使用get_notification_transport来获取通知传输实例
+    notification_transport = messaging.get_notification_transport(conf,
+                                                                  allowed_remote_exmods=exmods)
+    NOTIFIER = messaging.Notifier(notification_transport, serializer=serializer)
 
 
 def cleanup():
@@ -101,7 +103,7 @@ class RequestContextSerializer(messaging.Serializer):
 
     def deserialize_context(self, context):
         #        return valence.common.context.Context.from_dict(context)
-        return zilong_ctx.Context.from_dict(context)
+        return oslo_ctx.RequestContext.from_dict(context)
 
 
 def get_transport_url(url_str=None):

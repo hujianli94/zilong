@@ -1,4 +1,3 @@
-from oslo_config import cfg
 from pecan.hooks import PecanHook
 
 
